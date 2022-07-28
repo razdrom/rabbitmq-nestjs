@@ -19,6 +19,9 @@
     "amqplib",
     "amqp"
   ],
+  "files": [
+    "lib"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/razdrom/rabbitmq-nestjs/issues"
