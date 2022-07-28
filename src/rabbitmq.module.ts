@@ -9,7 +9,7 @@ import {
 
 const defaultProviderToken = 'RABBITMQ_DEFAULT_CLIENT';
 
-export const InjectRabbitmq = (token?: string) =>
+export const InjectRabbitMQ = (token?: string) =>
 	Inject(token || defaultProviderToken);
 
 export class RabbitMQProxyFactory implements ClientProxyFactory {
