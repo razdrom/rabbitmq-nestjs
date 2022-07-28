@@ -1,9 +1,14 @@
 {
   "name": "rabbitmq-nestjs",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "RabbitMQ adapter for NestJS",
   "author": "Razdrogin Roman <r.razdrogin@gmail.com>",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepare" : "npm run build"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/razdrom/nestjs-rabbitmq.git"
