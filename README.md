@@ -1,0 +1,1 @@
+### RabbitMQ adapter for NestJS
