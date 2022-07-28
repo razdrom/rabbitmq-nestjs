@@ -1,6 +1,6 @@
 {
-  "name": "nestjs-rabbitmq",
-  "version": "1.0.0",
+  "name": "rabbitmq-nestjs",
+  "version": "1.0.1",
   "description": "RabbitMQ adapter for NestJS",
   "author": "Razdrogin Roman <r.razdrogin@gmail.com>",
   "main": "index.js",
@@ -16,9 +16,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/razdrom/nestjs-rabbitmq/issues"
+    "url": "https://github.com/razdrom/rabbitmq-nestjs/issues"
   },
-  "homepage": "https://github.com/razdrom/nestjs-rabbitmq#readme",
+  "homepage": "https://github.com/razdrom/rabbitmq-nestjs#readme",
   "dependencies": {
     "@nestjs/common": "^9.0.7",
     "@nestjs/microservices": "^9.0.7",
