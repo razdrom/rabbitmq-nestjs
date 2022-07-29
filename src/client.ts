@@ -12,7 +12,7 @@ import { ClientProxy, ReadPacket, WritePacket } from '@nestjs/microservices';
 export class RabbitMQClient extends ClientProxy {
 	private channel: ChannelWrapper;
 	private connection: AmqpConnectionManager;
-	private readonly exchangeName = null;
+	private exchangeName = null;
 	private replyQueue = {
 		name: null,
 		listener: new EventEmitter(),
@@ -21,13 +21,13 @@ export class RabbitMQClient extends ClientProxy {
 
 	constructor(private readonly options: ClientOptions) {
 		super();
-		this.exchangeName = options.exchange.name;
-		this.replyQueue.name = options.replyQueueName || randomUUID()
 	}
 
 	public async connect(): Promise<AmqpConnectionManager> {
 		if (!this.connection || !this.channel) {
-			const { connection, exchange } = this.options;
+			const { connection, exchange, replyQueueName } = this.options;
+			this.exchangeName = exchange.name;
+			this.replyQueue.name = replyQueueName || randomUUID()
 
 			// Setup connection
 			this.connection = connect(connection.url, connection.options);
