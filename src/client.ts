@@ -4,7 +4,7 @@ import {
 	ChannelWrapper,
 	connect,
 } from 'amqp-connection-manager';
-import * as EventEmitter from 'events';
+import EventEmitter from 'events';
 import { randomUUID } from 'crypto';
 import { parseBuffer } from './helpers/parseBuffer';
 import { ClientProxy, ReadPacket, WritePacket } from '@nestjs/microservices';

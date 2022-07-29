@@ -4,7 +4,7 @@ import {
 	ChannelWrapper,
 	connect,
 } from 'amqp-connection-manager';
-import { Logger } from '@nestjs/common';
+import {Logger, LoggerService} from '@nestjs/common';
 
 import { ServerOptions } from './types';
 import { parseBuffer } from './helpers/parseBuffer';
@@ -18,56 +18,68 @@ export enum ConnectionManagerEvent {
 export class RabbitMQServer extends Server implements CustomTransportStrategy {
 	private channel: ChannelWrapper;
 	private connection: AmqpConnectionManager;
+	protected logger: LoggerService
 	constructor(private readonly options: ServerOptions) {
 		super();
+		this.logger = options.logger || Logger
 	}
 
 	public async listen() {
-		const { connection, queue } = this.options;
+		const {connection, queue} = this.options;
 
 		// Setup connection
 		this.connection = connect(connection.url, connection.options);
 
 		this.connection.on(ConnectionManagerEvent.CONNECT, () => {
-			Logger.log('RabbitMQ connection established');
+			this.logger.log('RabbitMQ connection established');
 		});
 
 		this.connection.on(ConnectionManagerEvent.CONNECT_FAILED, () => {
-			Logger.error('RabbitMQ connection failed, trying to reconnect...');
+			this.logger.error('RabbitMQ connection failed, trying to reconnect...');
 		});
 
 		this.connection.on(ConnectionManagerEvent.DISCONNECT, () => {
-			Logger.error('RabbitMQ disconnected, trying to reconnect...');
+			this.logger.error('RabbitMQ disconnected, trying to reconnect...');
 		});
 
 		// Setup channel
-		this.channel = this.connection.createChannel({ json: true });
+		this.channel = this.connection.createChannel({json: true});
 		await this.channel.addSetup(async (channel) => {
-			await channel.assertQueue(queue.name, queue.options);
-			for (const routingKey of this.messageHandlers.keys()) {
-				await channel.bindQueue(queue.name, queue.exchange, routingKey);
-			}
-		});
+			let queues = Array.isArray(queue) ? queue : [queue]
 
-		// Setup consumer
-		await this.channel.consume(queue.name, async (message) => {
-			const {
-				fields: { routingKey },
-				properties: { correlationId, replyTo },
-				content,
-			} = message;
+			for (const queue of queues) {
+				await channel.assertQueue(queue.name, queue.options);
 
-			const handler = this.messageHandlers.get(routingKey);
-			if (handler) {
-				const payload = parseBuffer(content);
-				const reply = await handler(payload).catch();
-				if (!handler.isEventHandler) {
-					await this.channel.sendToQueue(replyTo, reply, {
-						correlationId,
-					});
+				// Bind queue routing keys
+				for (const [routingKey, {extras}] of this.messageHandlers) {
+					if (queue.name === extras.queue) {
+						await channel.bindQueue(queue.name, queue.exchange, routingKey)
+					}
 				}
+
+				// Setup consumer
+				await channel.consume(queue.name, async (message) => {
+					if (message) {
+						const {
+							fields: {routingKey},
+							properties: {correlationId, replyTo},
+							content,
+						} = message;
+
+						const handler = this.messageHandlers.get(routingKey);
+						if (handler) {
+							const payload = parseBuffer(content);
+							const reply = await handler(payload).catch();
+							if (!handler.isEventHandler) {
+								await this.channel.sendToQueue(replyTo, reply, {
+									correlationId,
+								});
+							}
+						}
+						this.channel.ack(message);
+					}
+				});
 			}
-			this.channel.ack(message);
 		});
 	}
 

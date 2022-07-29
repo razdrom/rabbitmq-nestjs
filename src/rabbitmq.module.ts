@@ -1,4 +1,4 @@
-import { Inject, Module, Provider } from '@nestjs/common';
+import { Module, Provider } from '@nestjs/common';
 import { ClientOptions } from './types';
 import { RabbitMQClient } from './client';
 import { ClientProxyFactory } from '@nestjs/microservices';
@@ -7,10 +7,7 @@ import {
 	RabbitMQFactoryOptions,
 } from './types/factory-options';
 
-const defaultProviderToken = 'RABBITMQ_DEFAULT_CLIENT';
-
-export const InjectRabbitMQ = (token?: string) =>
-	Inject(token || defaultProviderToken);
+export const defaultProviderToken = 'RABBITMQ_DEFAULT_CLIENT';
 
 export class RabbitMQProxyFactory implements ClientProxyFactory {
 	public static create(options: ClientOptions) {
