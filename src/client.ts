@@ -14,7 +14,7 @@ export class RabbitMQClient extends ClientProxy {
 	private connection: AmqpConnectionManager;
 	private readonly exchangeName = null;
 	private replyQueue = {
-		name: null,
+		name: randomUUID(),
 		listener: new EventEmitter(),
 		timeout: 10 * 1000,
 	};
@@ -22,7 +22,7 @@ export class RabbitMQClient extends ClientProxy {
 	constructor(private readonly options: ClientOptions) {
 		super();
 		this.exchangeName = options.exchange.name;
-		this.replyQueue.name = options.replyQueueName || `${this.exchangeName}.${randomUUID()}.reply_queue`
+		this.replyQueue.name = options.replyQueueName
 	}
 
 	public async connect(): Promise<AmqpConnectionManager> {
