@@ -1,6 +1,6 @@
 {
   "name": "rabbitmq-nestjs",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "RabbitMQ adapter for NestJS",
   "author": "Razdrogin Roman <r.razdrogin@gmail.com>",
   "main": "lib/index.js",

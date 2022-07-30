@@ -24,7 +24,7 @@ export class RabbitMQServer extends Server implements CustomTransportStrategy {
 		this.logger = options.logger || Logger
 	}
 
-	public async listen() {
+	public async listen(cb) {
 		const {connection, queue} = this.options;
 
 		// Setup connection
@@ -51,10 +51,14 @@ export class RabbitMQServer extends Server implements CustomTransportStrategy {
 				await channel.assertQueue(queue.name, queue.options);
 
 				// Bind queue routing keys
-				for (const [routingKey, {extras}] of this.messageHandlers) {
-					if (queue.name === extras.queue) {
-						await channel.bindQueue(queue.name, queue.exchange, routingKey)
+				try {
+					for (const [routingKey, {extras}] of this.messageHandlers) {
+						if (queue.name === extras.queue) {
+							await channel.bindQueue(queue.name, queue.exchange, routingKey)
+						}
 					}
+				} catch (error) {
+					this.logger.error(error)
 				}
 
 				// Setup consumer
@@ -80,7 +84,7 @@ export class RabbitMQServer extends Server implements CustomTransportStrategy {
 					}
 				});
 			}
-		});
+		})
 	}
 
 	public async close() {
